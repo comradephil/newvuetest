@@ -1,74 +1,203 @@
 <template>
-    <div class="panel-wrap">
-        <h1>{{$t('hello',{user:user.firstname})}}</h1>
-        <div id="mainarea">
-            <component v-for="(item,i) in mainItems" v-if="item.visible" :is="item.template" :key="i"></component>
-        </div>
-        <div id="sidebar">
-            <component v-for="(item,i) in subMenuItems" v-if="item.visible" :is="item.template" :key="i"></component>
-        </div>
+    <div>
+      <b-row>
+        <b-col>
+          <h1>{{$t('hello',{user:user.firstname})}}</h1>
+        </b-col>
+      </b-row>      
+      <b-row v-drag-and-drop:options="dragoptions" class="dragwrapper">
+        <b-col cols="2" id="sidebar" class="dropzone" ref="sidebar">
+            <component v-for="(item) in subItems" v-if="item.visible" :is="item.template" v-bind="item.props" :key="item.label"></component>
+        </b-col>
+        <b-col cols="10" id="mainarea" class="dropzone" ref="mainarea">
+            <component v-for="(item) in mainItems" v-if="item.visible" :is="item.template" v-bind="item.props" :key="item.label"></component>
+        </b-col>
+      </b-row>
     </div>
 </template>
 
 <script>
 import StatsView from "../Layouts/StatsView";
 import TextView from "../Layouts/TextView";
-import Canvas from "../Layouts/Canvas";
-// eslint-disable-next-line
+import ProgressBar from "../Layouts/ProgressBar";
+// eslint-disable-next-line 
 import lang from "@/lang";
 
 export default {
   name: "Dash",
   data() {
+    const self = this
     return {
       user: this.$store.state.user,
-      mainItems: [
+      dragoptions: {
+        dropzoneSelector: ".dropzone",
+        draggableSelector: ".draggable",
+        onDrop(event) {
+          // console.log(event.items[0].id)
+          // console.log(event.owner.id)
+          // console.log(event.droptarget.id)
+          // console.log(self.$refs['sidebar'].childNodes)
+          // console.log(self.$refs['mainarea'].childNodes)
+          self.saveView()
+        }
+      },
+      menuItems: [
         {
           label: "Summary",
-          template: "StatsView",
-          visible: true
-        }
-      ],
-      subMenuItems: [
-        {
-          label: "Projects",
-          template: "Canvas",
-          visible: true
+          template: "ProgressBar",
+          visible: true,
+          targetarea: "main",
+          props: {
+            title: "Summary",
+            body: "This section is under construction",
+            class: "draggable"
+          }
         },
         {
-          label: "Games",
-          template: "Canvas",
-          visible: true
+          label: "Projects",
+          template: "ProgressBar",
+          visible: true,
+          targetarea: "side",
+          props: {
+            title: "Projects",
+            body: "This section is under construction",
+            class: "draggable"
+          }
         },
         {
           label: "About",
-          template: "TextView",
-          visible: true
-        }
+          template: "ProgressBar",
+          visible: true,
+          targetarea: "side",
+          props: {
+            title: "About",
+            body: "This section is under construction",
+            class: "draggable"
+          }
+        },
+        {
+          label: "Games",
+          template: "ProgressBar",
+          visible: true,
+          targetarea: "side",
+          props: {
+            title: "Games",
+            body: "This section is under construction",
+            class: "draggable"
+          }
+        },
       ]
     };
+  },
+  computed: {
+    subItems() {
+      return this.menuItems.filter(x => x.targetarea === "side")
+    },
+    mainItems() {
+      return this.menuItems.filter(x => x.targetarea === "main")
+    }
+  },
+  methods: {
+    saveView() {
+      let self = this
+      let newOrder = []
+      let sidebar = Array.from((Array.from(self.$refs['sidebar'].childNodes).filter(x => x.id)), x => x.id) 
+      let mainarea = Array.from((Array.from(self.$refs['mainarea'].childNodes).filter(x => x.id)), x => x.id)
+
+      sidebar.forEach(function(x) {
+        let item = self.menuItems[self.lookupItem(x)]
+        newOrder.push(item)
+        newOrder[newOrder.length-1].targetarea = "side"
+      })
+      mainarea.forEach(function(x) {
+        let item = self.menuItems[self.lookupItem(x)]
+        newOrder.push(item)
+        newOrder[newOrder.length-1].targetarea = "main"
+      })
+      this.$store.commit("updateMenuOrder", newOrder);
+    },
+    lookupItem(item) {
+      return this.menuItems.findIndex(x => x.label.toLowerCase() === item)
+    }
+  },
+  mounted() {
+    if(this.$store.state.menuItems.length > 0) {
+      this.menuItems = this.$store.state.menuItems;
+    }
   },
   components: {
     StatsView,
     TextView,
-    Canvas
+    ProgressBar
   }
 };
 </script>
 
-<style>
+<style scoped>
+.dragwrapper {
+  display: flex;
+}
+.dropzone {
+  height: flex;
+}
+
+/* drop target state */
+.dropzone[aria-dropeffect="move"] {
+  border-color:#68b;
+  border-style:dashed;
+}
+
+/* drop target focus and dragover state */
+.dropzone[aria-dropeffect="move"]:focus,
+.dropzone[aria-dropeffect="move"].dragover
+{
+  outline:none;
+}
+
+/* draggable items */
+
+.draggable:hover {
+  box-shadow:0 0 0 2px #68b, inset 0 0 0 1px #ddd;
+}
+
+/* items focus state */
+.draggable:focus
+{
+  outline:none;
+  box-shadow:0 0 0 2px #68b, inset 0 0 0 1px #ddd;
+}
+
+/* items grabbed state */
+.draggable[aria-grabbed="true"]
+{
+  background:#5cc1a6;
+  color:#fff;
+}
+
+@keyframes nodeInserted {
+    from { opacity: 0.2; }
+    to { opacity: 0.8; }
+}
+
+.item-dropzone-area {
+    height: 2rem;
+    background: #888;
+    opacity: 0.8;
+    animation-duration: 0.5s;
+    animation-name: nodeInserted;
+}
+
 #sidebar {
-  display: table-cell;
   margin: 0;
   padding: 20px 0 20px 20px;
-  width: 220px;
   vertical-align: top;
+  float: left;
 }
 #mainarea {
-  display: table-cell;
   margin: 0;
   padding: 20px;
-  width: 680px;
+  width: 100%;
+
   vertical-align: top;
 }
 </style>

@@ -37,6 +37,9 @@ export default new Vuex.Store({
     },
     changeLanguage(state, payload) {
       state.selectedLanguage = payload;
+    },
+    updateMenuOrder(state,payload) {
+      state.menuItems = payload;
     }
   }
 });

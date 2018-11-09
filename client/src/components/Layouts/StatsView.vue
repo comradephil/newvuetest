@@ -1,13 +1,13 @@
 <template>
-    <div></div>
+    <div><b-card></b-card></div>
 </template>
 
 <script>
-    export default {
-        name: "StatsView"
-    }
+export default {
+  name: "StatsView",
+  props: ["title", "body", "draggable"]
+};
 </script>
 
 <style scoped>
-
 </style>
