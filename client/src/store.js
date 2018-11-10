@@ -32,13 +32,13 @@ export default new Vuex.Store({
     login(state, payload) {
       state.loggedIn = payload;
     },
-    userdata(state,payload) {
+    userdata(state, payload) {
       state.user = payload;
     },
     changeLanguage(state, payload) {
       state.selectedLanguage = payload;
     },
-    updateMenuOrder(state,payload) {
+    updateMenuOrder(state, payload) {
       state.menuItems = payload;
     }
   }

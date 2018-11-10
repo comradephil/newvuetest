@@ -17,17 +17,17 @@ export default {
         return response;
       })
       .catch(err => {
-        return JSON.parse('{error:"' + err + '"}')
+        return JSON.parse('{error:"' + err + '"}');
       });
   },
   logout() {
     return axios
-      .get(this.props.server + 'logout')
+      .get(this.props.server + "logout")
       .then(response => {
         return response;
       })
       .catch(err => {
-        return JSON.parse('{error:"' + err + '"}')
+        return JSON.parse('{error:"' + err + '"}');
       });
   },
   getAssets() {
@@ -37,7 +37,7 @@ export default {
         return response;
       })
       .catch(err => {
-        return JSON.parse('{error:"' + err + '"}')
+        return JSON.parse('{error:"' + err + '"}');
       });
   }
 };

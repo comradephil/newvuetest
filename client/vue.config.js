@@ -1,4 +1,4 @@
 module.exports = {
-  assetsDir: 'assets',
+  assetsDir: "assets",
   runtimeCompiler: true
-}
+};

@@ -20,25 +20,20 @@
 import StatsView from "../Layouts/StatsView";
 import TextView from "../Layouts/TextView";
 import ProgressBar from "../Layouts/ProgressBar";
-// eslint-disable-next-line 
+// eslint-disable-next-line
 import lang from "@/lang";
 
 export default {
   name: "Dash",
   data() {
-    const self = this
+    const self = this;
     return {
       user: this.$store.state.user,
       dragoptions: {
         dropzoneSelector: ".dropzone",
         draggableSelector: ".draggable",
-        onDrop(event) {
-          // console.log(event.items[0].id)
-          // console.log(event.owner.id)
-          // console.log(event.droptarget.id)
-          // console.log(self.$refs['sidebar'].childNodes)
-          // console.log(self.$refs['mainarea'].childNodes)
-          self.saveView()
+        onDrop() {
+          self.saveView();
         }
       },
       menuItems: [
@@ -85,43 +80,55 @@ export default {
             body: "This section is under construction",
             class: "draggable"
           }
-        },
+        }
       ]
     };
   },
   computed: {
     subItems() {
-      return this.menuItems.filter(x => x.targetarea === "side")
+      return this.menuItems.filter(x => x.targetarea === "side");
     },
     mainItems() {
-      return this.menuItems.filter(x => x.targetarea === "main")
+      return this.menuItems.filter(x => x.targetarea === "main");
     }
   },
   methods: {
     saveView() {
-      let self = this
-      let newOrder = []
-      let sidebar = Array.from((Array.from(self.$refs['sidebar'].childNodes).filter(x => x.id)), x => x.id) 
-      let mainarea = Array.from((Array.from(self.$refs['mainarea'].childNodes).filter(x => x.id)), x => x.id)
-
+      //self is this. this being the Vue
+      let self = this;
+      let newOrder = [];
+      //create an array from elements that contain ids and then filter them to just the ids
+      let sidebar = Array.from(
+        Array.from(self.$refs["sidebar"].childNodes).filter(x => x.id),
+        x => x.id
+      );
+      let mainarea = Array.from(
+        Array.from(self.$refs["mainarea"].childNodes).filter(x => x.id),
+        x => x.id
+      );
+      //given how the arrays are constructed we have the order defined by index in the array
+      //now loop through them and get the associated object from the full data set
       sidebar.forEach(function(x) {
-        let item = self.menuItems[self.lookupItem(x)]
-        newOrder.push(item)
-        newOrder[newOrder.length-1].targetarea = "side"
-      })
+        let item = self.menuItems[self.lookupItem(x)];
+        newOrder.push(item);
+        //important - update props in new array not reference object
+        newOrder[newOrder.length - 1].targetarea = "side";
+      });
       mainarea.forEach(function(x) {
-        let item = self.menuItems[self.lookupItem(x)]
-        newOrder.push(item)
-        newOrder[newOrder.length-1].targetarea = "main"
-      })
+        let item = self.menuItems[self.lookupItem(x)];
+        newOrder.push(item);
+        newOrder[newOrder.length - 1].targetarea = "main";
+      });
+      //notify the store of the new order(s)
       this.$store.commit("updateMenuOrder", newOrder);
     },
     lookupItem(item) {
-      return this.menuItems.findIndex(x => x.label.toLowerCase() === item)
+      return this.menuItems.findIndex(x => x.label.toLowerCase() === item);
     }
   },
+  //on mounted check whether we have an order saved, otherwise, it's the default
   mounted() {
-    if(this.$store.state.menuItems.length > 0) {
+    if (this.$store.state.menuItems.length > 0) {
       this.menuItems = this.$store.state.menuItems;
     }
   },
@@ -143,48 +150,49 @@ export default {
 
 /* drop target state */
 .dropzone[aria-dropeffect="move"] {
-  border-color:#68b;
-  border-style:dashed;
+  border-color: #68b;
+  border-style: dashed;
 }
 
 /* drop target focus and dragover state */
 .dropzone[aria-dropeffect="move"]:focus,
-.dropzone[aria-dropeffect="move"].dragover
-{
-  outline:none;
+.dropzone[aria-dropeffect="move"].dragover {
+  outline: none;
 }
 
 /* draggable items */
 
 .draggable:hover {
-  box-shadow:0 0 0 2px #68b, inset 0 0 0 1px #ddd;
+  box-shadow: 0 0 0 2px #68b, inset 0 0 0 1px #ddd;
 }
 
 /* items focus state */
-.draggable:focus
-{
-  outline:none;
-  box-shadow:0 0 0 2px #68b, inset 0 0 0 1px #ddd;
+.draggable:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #68b, inset 0 0 0 1px #ddd;
 }
 
 /* items grabbed state */
-.draggable[aria-grabbed="true"]
-{
-  background:#5cc1a6;
-  color:#fff;
+.draggable[aria-grabbed="true"] {
+  background: #5cc1a6;
+  color: #fff;
 }
 
 @keyframes nodeInserted {
-    from { opacity: 0.2; }
-    to { opacity: 0.8; }
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 0.8;
+  }
 }
 
 .item-dropzone-area {
-    height: 2rem;
-    background: #888;
-    opacity: 0.8;
-    animation-duration: 0.5s;
-    animation-name: nodeInserted;
+  height: 2rem;
+  background: #888;
+  opacity: 0.8;
+  animation-duration: 0.5s;
+  animation-name: nodeInserted;
 }
 
 #sidebar {

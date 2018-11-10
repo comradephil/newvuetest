@@ -19,7 +19,7 @@ export default {
       max: 100
     };
   },
-  props: ['title','body','draggable'],
+  props: ["title", "body", "draggable"],
   computed: {
     type() {
       return this.counter > 25
@@ -32,9 +32,9 @@ export default {
     },
     popoverInfo() {
       return {
-        title: 'Progress',
+        title: "Progress",
         body: `Currently ${Math.round(this.counter)}% complete`
-      }
+      };
     }
   }
 };
